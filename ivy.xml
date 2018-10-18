@@ -18,7 +18,7 @@
 <ivy-module version="2.0"
             xmlns:e="http://ant.apache.org/ivy/extra">
 
-  <info organisation="org.apache.zookeeper"
+  <info organisation="com.atscale.engine.zookeeper"
         module="${name}" revision="${version}">
     <license name="Apache 2.0"/>
     <ivyauthor name="Apache ZooKeeper" url="http://zookeeper.apache.org"/>
