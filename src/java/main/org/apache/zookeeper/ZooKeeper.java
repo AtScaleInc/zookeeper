@@ -439,6 +439,13 @@ public class ZooKeeper {
             boolean canBeReadOnly)
         throws IOException
     {
+        this(connectString, sessionTimeout, watcher, false, true);
+    }
+
+    public ZooKeeper(String connectString, int sessionTimeout, Watcher watcher,
+	    boolean canBeReadOnly, boolean useZooKeeperSaslClient)
+        throws IOException
+    {
         LOG.info("Initiating client connection, connectString=" + connectString
                 + " sessionTimeout=" + sessionTimeout + " watcher=" + watcher);
 
@@ -450,9 +457,11 @@ public class ZooKeeper {
                 connectStringParser.getServerAddresses());
         cnxn = new ClientCnxn(connectStringParser.getChrootPath(),
                 hostProvider, sessionTimeout, this, watchManager,
-                getClientCnxnSocket(), canBeReadOnly);
+			      getClientCnxnSocket(), canBeReadOnly,
+                                                     useZooKeeperSaslClient);
         cnxn.start();
     }
+
 
     /**
      * To create a ZooKeeper client object, the application needs to pass a

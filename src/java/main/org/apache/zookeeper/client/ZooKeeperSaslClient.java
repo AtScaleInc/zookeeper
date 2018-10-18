@@ -65,6 +65,10 @@ public class ZooKeeperSaslClient {
         return Boolean.valueOf(System.getProperty(ENABLE_CLIENT_SASL_KEY, ENABLE_CLIENT_SASL_DEFAULT));
     }
 
+    public static boolean isEnabledForAtscale() {
+        return false;
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(ZooKeeperSaslClient.class);
     private static Login login = null;
     private SaslClient saslClient;
