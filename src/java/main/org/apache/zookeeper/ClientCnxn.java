@@ -1342,7 +1342,7 @@ public class ClientCnxn {
 
         public boolean clientTunneledAuthenticationInProgress() {
             // 1. SASL client is disabled.
-            if (!ZooKeeperSaslClient.isEnabled() && useZooKeeperSaslClient) {
+            if (!ZooKeeperSaslClient.isEnabled() || !useZooKeeperSaslClient) {
                 return false;
             }
 
