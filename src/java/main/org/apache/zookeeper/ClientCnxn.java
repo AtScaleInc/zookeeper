@@ -175,6 +175,8 @@ public class ClientCnxn {
      */
     private boolean readOnly;
 
+    private boolean useZooKeeperSaslClient;
+
     final String chrootPath;
 
     final SendThread sendThread;
@@ -360,7 +362,22 @@ public class ClientCnxn {
             ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket, boolean canBeReadOnly)
             throws IOException {
         this(chrootPath, hostProvider, sessionTimeout, zooKeeper, watcher,
-             clientCnxnSocket, 0, new byte[16], canBeReadOnly);
+             clientCnxnSocket, 0, new byte[16], canBeReadOnly, true);
+    }
+
+    public ClientCnxn(String chrootPath, HostProvider hostProvider, int sessionTimeout, ZooKeeper zooKeeper,
+		      ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket, boolean canBeReadOnly,
+                      boolean useZooKeeperSaslClient)
+            throws IOException {
+        this(chrootPath, hostProvider, sessionTimeout, zooKeeper, watcher,
+             clientCnxnSocket, 0, new byte[16], canBeReadOnly, useZooKeeperSaslClient);
+    }
+
+    public ClientCnxn(String chrootPath, HostProvider hostProvider, int sessionTimeout, ZooKeeper zooKeeper,
+            ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,
+		      long sessionId, byte[] sessionPasswd, boolean canBeReadOnly) {
+        this(chrootPath, hostProvider, sessionTimeout, zooKeeper, watcher,
+             clientCnxnSocket, sessionId, sessionPasswd, canBeReadOnly, true);
     }
 
     /**
@@ -387,7 +404,8 @@ public class ClientCnxn {
      */
     public ClientCnxn(String chrootPath, HostProvider hostProvider, int sessionTimeout, ZooKeeper zooKeeper,
             ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,
-            long sessionId, byte[] sessionPasswd, boolean canBeReadOnly) {
+		      long sessionId, byte[] sessionPasswd, boolean canBeReadOnly,
+                              boolean useZooKeeperSaslClient) {
         this.zooKeeper = zooKeeper;
         this.watcher = watcher;
         this.sessionId = sessionId;
@@ -395,6 +413,7 @@ public class ClientCnxn {
         this.sessionTimeout = sessionTimeout;
         this.hostProvider = hostProvider;
         this.chrootPath = chrootPath;
+        this.useZooKeeperSaslClient = useZooKeeperSaslClient;
 
         connectTimeout = sessionTimeout / hostProvider.size();
         readTimeout = sessionTimeout * 2 / 3;
@@ -996,7 +1015,7 @@ public class ClientCnxn {
 
             setName(getName().replaceAll("\\(.*\\)",
                     "(" + addr.getHostName() + ":" + addr.getPort() + ")"));
-            if (ZooKeeperSaslClient.isEnabled()) {
+            if (ZooKeeperSaslClient.isEnabled() && useZooKeeperSaslClient) {
                 try {
                     String principalUserName = System.getProperty(
                             ZK_SASL_CLIENT_USERNAME, "zookeeper");
@@ -1323,7 +1342,7 @@ public class ClientCnxn {
 
         public boolean clientTunneledAuthenticationInProgress() {
             // 1. SASL client is disabled.
-            if (!ZooKeeperSaslClient.isEnabled()) {
+            if (!ZooKeeperSaslClient.isEnabled() && useZooKeeperSaslClient) {
                 return false;
             }
 
